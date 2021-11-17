@@ -1,14 +1,22 @@
 version: '3.4'
 
 services:
-  web:
+  flask:
     build: ./
-    container_name: web
+    container_name: flask
     environment:
       FLASK_ENV: development
       FLASK_APP: app/main
-    ports:
-      - "${PORT}:80"
+#    ports:
+#      - "${PORT}:80"
+#      - "5432:5432"
     volumes:
-      - "${PWD}:/app"
-    command: flask run --host=0.0.0.0 --port 80
+      - "./:/app"
+#    command: flask run --host=0.0.0.0 --port 80
+  nginx:
+    build: ./services/nginx
+    ports:
+      - 80:80
+    depends_on:
+      - flask
+

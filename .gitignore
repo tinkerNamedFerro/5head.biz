@@ -9,4 +9,5 @@ instance/
 htmlcov/
 dist/
 build/
+/services/certbot
 *.egg-info/

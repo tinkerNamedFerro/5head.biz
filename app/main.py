@@ -6,8 +6,10 @@ app.config.from_object("config.Config")
 with app.app_context():
     from . import routes
     from .dash import demo, iris_kmeans, crossfilter_example
+    from .dash.biz_insights import tickerMentions
 
     app = demo.init_dash(app)
+    app = tickerMentions.init_dash(app)
     app = iris_kmeans.init_dash(app)
     app = crossfilter_example.init_dash(app)
 

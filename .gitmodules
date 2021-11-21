@@ -1,0 +1,3 @@
+[submodule "app/dash/biz_insights"]
+	path = app/dash/biz_insights
+	url = https://github.com/tinkerNamedFerro/biz_insights.git

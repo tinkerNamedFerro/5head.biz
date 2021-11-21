@@ -11,6 +11,8 @@ RUN apt-get update \
 COPY ./ /app
 WORKDIR /app
 
+RUN python -m pip install -r /app/app/dash/biz_insights/requirements.txt
+
 RUN poetry install --no-root
 # STATIC_PATH configures nginx to serve static assets directly
 ENV \

@@ -27,21 +27,21 @@ app_layout = dbc.Container(
                                     ],
                                     value="Fertility rate, total (births per woman)",
                                 ),
-                                dbc.FormGroup(
-                                    [
-                                        dbc.RadioItems(
-                                            id="crossfilter-xaxis-type",
-                                            inline=True,
-                                            options=[
-                                                {"label": i, "value": i} for i in ["Linear", "Log"]
-                                            ],
-                                            value="Linear",
-                                            labelStyle={"display": "inline-block"},
-                                        ),
+                                # dbc.FormGroup(
+                                #     [
+                                #         dbc.RadioItems(
+                                #             id="crossfilter-xaxis-type",
+                                #             inline=True,
+                                #             options=[
+                                #                 {"label": i, "value": i} for i in ["Linear", "Log"]
+                                #             ],
+                                #             value="Linear",
+                                #             labelStyle={"display": "inline-block"},
+                                #         ),
 
-                                    ],
-                                    className="p-2"
-                                ),
+                                #     ],
+                                #     className="p-2"
+                                # ),
                             ]
                         ),
                         dbc.Card(
@@ -79,20 +79,20 @@ app_layout = dbc.Container(
                                     ],
                                     value="Life expectancy at birth, total (years)",
                                 ),
-                                dbc.FormGroup(
-                                    [
-                                        dbc.RadioItems(
-                                            id="crossfilter-yaxis-type",
-                                            inline=True,
-                                            options=[
-                                                {"label": i, "value": i} for i in ["Linear", "Log"]
-                                            ],
-                                            value="Linear",
-                                            labelStyle={"display": "inline-block"},
-                                        ),
-                                    ],
-                                    className="p-2"
-                                ),
+                                # dbc.FormGroup(
+                                #     [
+                                #         dbc.RadioItems(
+                                #             id="crossfilter-yaxis-type",
+                                #             inline=True,
+                                #             options=[
+                                #                 {"label": i, "value": i} for i in ["Linear", "Log"]
+                                #             ],
+                                #             value="Linear",
+                                #             labelStyle={"display": "inline-block"},
+                                #         ),
+                                #     ],
+                                #     className="p-2"
+                                # ),
                             ]
                         ),
                         dbc.Card(

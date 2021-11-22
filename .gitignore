@@ -11,3 +11,6 @@ dist/
 build/
 /services/certbot
 *.egg-info/
+coingeckoCoins.p
+graphingDF.p
+data.json

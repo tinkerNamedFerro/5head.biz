@@ -15,14 +15,15 @@ It allows you to
 
 ## Overview
 
-- [What's included](#whats-included)
-- [Getting started](#getting-started)
+- [Flask Dash App](#flask-dash-app)
+  - [Overview](#overview)
+  - [What's included](#whats-included)
+  - [Getting started](#getting-started)
     - [Integrate your Dash app](#integrate-your-dash-app)
-- [Examples](#examples)
-- [Development](#development)
-- [Global layout: integration of individual dash apps](#global-layout-integration-of-individual-dash-apps)
-- [Credits](#credits)
-- [License](#license)
+  - [Development](#development)
+  - [Global layout: integration of individual dash apps](#global-layout-integration-of-individual-dash-apps)
+  - [Credits](#credits)
+  - [License](#license)
 
 ## What's included
 
@@ -39,6 +40,11 @@ git clone https://github.com/tzelleke/flask-dash-app.git
 cd flask-dash-app
 cp .env.example .env
 docker-compose up -d
+```
+
+Local Server
+```
+uwsgi --ini ./local.ini
 ```
 
 ### Integrate your Dash app

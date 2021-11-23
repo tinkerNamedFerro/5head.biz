@@ -14,3 +14,12 @@ build/
 coingeckoCoins.p
 graphingDF.p
 data.json
+*.pyc
+*.pyo
+*.log
+.env
+data.json
+tester.xlsx
+test.txt
+text.txt
+tids.txt

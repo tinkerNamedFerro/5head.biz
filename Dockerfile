@@ -8,12 +8,13 @@ RUN apt-get update \
     && ln -s /opt/poetry/bin/poetry \
     && poetry config virtualenvs.create false
 
+COPY ./requirements.txt /requirements.txt
+RUN pip install -r /requirements.txt
+
 COPY ./ /app
 WORKDIR /app
 
-RUN python -m pip install -r /app/app/dash/biz_insights/requirements.txt
-
-RUN poetry install --no-root
+#RUN poetry install --no-root
 # STATIC_PATH configures nginx to serve static assets directly
 ENV \
     POETRY_HOME=/opt/poetry \

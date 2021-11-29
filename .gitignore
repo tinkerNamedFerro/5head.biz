@@ -23,3 +23,5 @@ tester.xlsx
 test.txt
 text.txt
 tids.txt
+dump.sql
+database.env

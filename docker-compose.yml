@@ -9,6 +9,14 @@ services:
       FLASK_APP: app/main
     volumes:
       - "./:/app"
+    depends_on:
+      - database
+      - redis
+    networks:
+      - db_nw
+      - web_nw
+      - redis_nw    
+
   nginx:
     image: nginx:1.15-alpine
     ports:
@@ -21,6 +29,8 @@ services:
     depends_on:
       - flask
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    networks:
+      - web_nw
 
   certbot:
     image: certbot/certbot
@@ -28,3 +38,77 @@ services:
       - ./services/certbot/conf:/etc/letsencrypt
       - ./services/certbot/www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+  
+  database:
+    image: "postgres" # use latest official postgres version
+    env_file:
+      - database.env # configure postgres
+    volumes:
+      - database-data:/var/lib/postgresql/data/ # persist data even if container shuts down
+    ports:
+      - "5432:5432"
+    networks:
+      - db_nw
+
+  worker:
+    build:
+      context: ./celery-queue
+      dockerfile: Dockerfile
+    command: celery -A tasks worker -l info -E
+    environment:
+      CELERY_BROKER_URL: redis://redis
+      CELERY_RESULT_BACKEND: redis://redis
+    depends_on:
+      - redis
+    networks:
+      - redis_nw
+    volumes: ['./celery-queue:/queue']
+  beat:
+    build:
+      context: ./celery-queue
+      dockerfile: Dockerfile
+    command: celery -A tasks beat -l info
+    environment:
+      CELERY_BROKER_URL: redis://redis
+      CELERY_RESULT_BACKEND: redis://redis
+    depends_on:
+      - redis
+    networks:
+      - redis_nw
+    volumes: ['./celery-queue:/queue']
+  monitor:
+    build:
+      context: ./celery-queue
+      dockerfile: Dockerfile
+    ports:
+     - "5555:5555"
+    command:  ['celery', 'flower', '-A', 'tasks']
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      - redis
+      - worker
+    networks:
+      - redis_nw
+    volumes: ['./celery-queue:/queue']
+  redis:
+    image: redis:alpine
+    networks:
+      - redis_nw
+    #ports:
+    #  - "6379:6379"
+
+
+
+
+networks:
+  db_nw:
+    driver: bridge
+  web_nw:
+    driver: bridge
+  redis_nw:
+    driver: bridge
+
+volumes:
+  database-data: # named volumes can be managed easier using docker-compose

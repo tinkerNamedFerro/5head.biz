@@ -199,7 +199,7 @@ def showSingleLineGraphMarket(app):
 def init_dash(server):
     dash_app = Dash(server=server, routes_pathname_prefix="/biz/", )
     dash_app.layout = app_layout
-    showSingleLineGraphMarket(dash_app)
+    #showSingleLineGraphMarket(dash_app)
     return dash_app.server
 
 if __name__ == '__main__':

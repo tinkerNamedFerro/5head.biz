@@ -42,8 +42,8 @@ celery.conf.beat_schedule = {
         "task": "tasks.getNewChanData",
         'schedule': crontab(minute=(datetime.now().minute + 1) % 10)
     },
-    # "regenGraph": {
-    #     "task": "tasks.regenGraphData",
-    #     'schedule': crontab(minute=(datetime.now().minute + 2) % 180), #Runs hourly starting 2 minutes from app start https://stackoverflow.com/questions/31764528/running-celery-task-when-celery-beat-starts
-    # }
+    "regenGraph": {
+        "task": "tasks.regenGraphData",
+        'schedule': crontab(minute=(datetime.now().minute + 2) % 180), #Runs hourly starting 2 minutes from app start https://stackoverflow.com/questions/31764528/running-celery-task-when-celery-beat-starts
+    }
 }

@@ -52,9 +52,10 @@ services:
 
   worker:
     build:
-      context: ./celery-queue
+      context: ./
       dockerfile: Dockerfile
-    command: celery -A tasks worker -l info -E
+    working_dir: /app
+    command: celery -A app.tasks worker -l info -E
     environment:
       CELERY_BROKER_URL: redis://redis
       CELERY_RESULT_BACKEND: redis://redis
@@ -62,12 +63,13 @@ services:
       - redis
     networks:
       - redis_nw
-    volumes: ['./celery-queue:/queue']
+    volumes: ["./:/app"]
   beat:
     build:
-      context: ./celery-queue
+      context: ./
       dockerfile: Dockerfile
-    command: celery -A tasks beat -l info
+    working_dir: /app
+    command: celery -A app.tasks beat -l info
     environment:
       CELERY_BROKER_URL: redis://redis
       CELERY_RESULT_BACKEND: redis://redis
@@ -75,14 +77,14 @@ services:
       - redis
     networks:
       - redis_nw
-    volumes: ['./celery-queue:/queue']
+    volumes: ["./:/app"]
   monitor:
     build:
-      context: ./celery-queue
+      context: ./
       dockerfile: Dockerfile
     ports:
      - "5555:5555"
-    command:  ['celery', 'flower', '-A', 'tasks']
+    command:  ['celery', 'flower', '-A', 'app.tasks']
     environment:
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
@@ -91,16 +93,11 @@ services:
       - worker
     networks:
       - redis_nw
-    volumes: ['./celery-queue:/queue']
+    volumes: ["./:/app"]
   redis:
     image: redis:alpine
     networks:
       - redis_nw
-    #ports:
-    #  - "6379:6379"
-
-
-
 
 networks:
   db_nw:

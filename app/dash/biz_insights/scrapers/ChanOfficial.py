@@ -1,7 +1,7 @@
 import bs4
 import requests 
 
-from CoinDict import *
+from ..CoinDict import *
 
 # Load json file for coin list 
 # generateCurrenciesList()

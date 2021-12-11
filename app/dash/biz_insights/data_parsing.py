@@ -13,6 +13,35 @@ from .CoinDict import *
 with open('data.json') as json_file:
     CD = json.load(json_file)
 
+def updateAllTickerData():
+    listOfTickers = getTickers()
+
+    # Get list of all coingecko
+    geckoCoinList = coinGeckoList()
+
+    print("Parsing biz coin data:")
+    t = tqdm.trange(len(listOfTickers))
+    first = True
+    for ticker in listOfTickers:
+        t.update(1)
+        # extract ticker name
+        ticker = ticker[0]
+        coin_data = getTickerDataPd(ticker)
+        if first:
+            first = False
+            df = MentionArrayToDf(ticker, coin_data,geckoCoinList)
+        else:
+            df2 = MentionArrayToDf(ticker, coin_data,geckoCoinList)
+            # Check if coin as atleast 9 days of activity
+            if len(df2.index) > 9:
+                # Doesn't work like python append thanks pandas
+                # https://www.reddit.com/r/learnpython/comments/99u87y/pandas_append_not_working_code_inside/
+                df = df.append(df2, ignore_index=True)
+
+    data = [time.time(), df]
+    pickle.dump( data, open( "graphingDF.p", "wb" ) )
+    return df
+
 def getAllTickerData():
     # Attempt to open graphing data pickle
     try:
@@ -21,36 +50,13 @@ def getAllTickerData():
         data = None
 
     # Check when pickle was last updated 
-    if data != None and  time.time() - data[0]  < 3599:
+    if data != None: #and  time.time() - data[0]  < 3599:
         print("Using pickled dataframe data")
         df = data[1]
     else:
-        listOfTickers = getTickers()
-
-        # Get list of all coingecko
-        geckoCoinList = coinGeckoList()
-
-        print("Parsing biz coin data:")
-        t = tqdm.trange(len(listOfTickers))
-        first = True
-        for ticker in listOfTickers:
-            t.update(1)
-            # extract ticker name
-            ticker = ticker[0]
-            coin_data = getTickerDataPd(ticker)
-            if first:
-                first = False
-                df = MentionArrayToDf(ticker, coin_data,geckoCoinList)
-            else:
-                df2 = MentionArrayToDf(ticker, coin_data,geckoCoinList)
-                # Check if coin as atleast 9 days of activity
-                if len(df2.index) > 9:
-                    # Doesn't work like python append thanks pandas
-                    # https://www.reddit.com/r/learnpython/comments/99u87y/pandas_append_not_working_code_inside/
-                    df = df.append(df2, ignore_index=True)
-
-        data = [time.time(), df]
-        pickle.dump( data, open( "graphingDF.p", "wb" ) )
+        # If data doesn't (is unlikely regen or just send errors ??? idk)
+        df = updateAllTickerData()
+        
     
     return (df)
 

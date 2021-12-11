@@ -91,7 +91,6 @@ app_layout = html.Div(
 
 def showSingleLineGraphMarket(app):
     df = getAllTickerData()
-
     # Get 10 day average sort by it 
     df["sma10"] = ta.sma(df.Mentions, length=20)
     # df = df.sort_values(by=['sma10'])
@@ -199,7 +198,7 @@ def showSingleLineGraphMarket(app):
 def init_dash(server):
     dash_app = Dash(server=server, routes_pathname_prefix="/biz/", )
     dash_app.layout = app_layout
-    #showSingleLineGraphMarket(dash_app)
+    showSingleLineGraphMarket(dash_app)
     return dash_app.server
 
 if __name__ == '__main__':

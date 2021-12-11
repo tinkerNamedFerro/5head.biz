@@ -3,8 +3,8 @@ import bs4
 import requests
 import ciso8601
 
-from CoinDict import *
-from postgres_db.bizThreads import *
+from ..CoinDict import *
+from ..postgres_db.bizThreads import *
 
 # Load json file for coin list 
 # generateCurrenciesList()
@@ -27,7 +27,7 @@ def checkTickerList(message):
            
     return found
 
-def tickerOnlyScrapeArchieve(threadId, tickerDb):
+def tickerOnlyScrapeArchieve(threadId):
     res = requests.get('https://archive.wakarimasen.moe/biz/thread/'+ threadId)
     soup = bs4.BeautifulSoup(res.content,"html.parser")
 
@@ -65,7 +65,6 @@ def tickerOnlyScrapeArchieve(threadId, tickerDb):
                 # Message
                 # instance["messageText"] = message
                 #print(instance)
-                # tickerDb.addTicker(ticker,instance)
                 addMention(ticker[0],instance)
         else:
             text = replies[index].get_text().replace(">", " ")
@@ -89,7 +88,6 @@ def tickerOnlyScrapeArchieve(threadId, tickerDb):
                 instance["coinGeckoId"] = ticker[1]
                 #print(instance)
                 addMention(ticker[0],instance)
-                #tickerDb.addTicker(ticker,instance)
 
 
             

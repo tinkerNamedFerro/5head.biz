@@ -14,55 +14,61 @@ services:
       - redis
     ports:
       - "5000:5000"
-    networks:
-      - redis_nw    
 
   worker:
     build:
-      context: ./app/celery-queue
-      dockerfile: Dockerfile.dev
-    command: celery -A tasks worker -l info -E
+      context: ./
+      dockerfile: Dockerfile
+    working_dir: /app
+    command: celery -A app.tasks worker -l info -E
     environment:
-      CELERY_BROKER_URL: redis://redis
-      CELERY_RESULT_BACKEND: redis://redis
+      CELERY_BROKER_URL: redis://127.0.0.1
+      CELERY_RESULT_BACKEND: redis://127.0.0.1
     depends_on:
       - redis
-    networks:
-      - redis_nw
-    volumes: ['./app/celery-queue:/queue']
+    # networks:
+    #   - redis_nw
+    network_mode: host
+    volumes: ["./:/app"]
   beat:
     build:
-      context: ./app/celery-queue
-      dockerfile: Dockerfile.dev
-    command: celery -A tasks beat -l info
+      context: ./
+      dockerfile: Dockerfile
+    working_dir: /app
+    command: celery -A app.tasks beat -l info
     environment:
-      CELERY_BROKER_URL: redis://redis
-      CELERY_RESULT_BACKEND: redis://redis
+      CELERY_BROKER_URL: redis://127.0.0.1
+      CELERY_RESULT_BACKEND: redis://127.0.0.1
     depends_on:
       - redis
-    networks:
-      - redis_nw
-    volumes: ['./app/celery-queue:/queue']
+    # networks:
+    #   - redis_nw
+    network_mode: host
+    volumes: ["./:/app"]
   monitor:
     build:
-      context: ./app/celery-queue
-      dockerfile: Dockerfile.dev
+      context: ./
+      dockerfile: Dockerfile
+    working_dir: /app
     ports:
      - "5555:5555"
-    command:  ['celery', 'flower', '-A', 'tasks']
+    command:  ['celery', 'flower', '-A', 'app.tasks']
     environment:
-      CELERY_BROKER_URL: redis://redis:6379/0
-      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://127.0.0.1:6379/0
+      CELERY_RESULT_BACKEND: redis://127.0.0.1:6379/0
     depends_on:
       - redis
       - worker
-    networks:
-      - redis_nw
-    volumes: ['./app/celery-queue:/queue']
+    # networks:
+    #   - redis_nw
+    network_mode: host
+    volumes: ["./:/app"]
   redis:
     image: redis:alpine
-    networks:
-      - redis_nw
+    ports:
+     - "6379:6379"
+    # networks:
+    #   - redis_nw
 
 
 

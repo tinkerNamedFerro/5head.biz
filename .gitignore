@@ -25,3 +25,4 @@ text.txt
 tids.txt
 dump.sql
 database.env
+celerybeat-schedule

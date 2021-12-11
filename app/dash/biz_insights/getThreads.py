@@ -69,12 +69,11 @@ def TextGetArchieve(fromPage, toPage):
         try:
             tlist = getTidsOnPage(page)
             # print("Scanning threads")
-            tickerDb = MongoDB_Biz_Ticker_Mentions()
             # for i in tqdm(range(0, len(tlist)-1)):
             for i in range(0, len(tlist)-1):
                 # threadJson = fullThreadScrape(tlist[i][:-2],url)
-                tickerOnlyScrapeArchieve(tlist[i],tickerDb)
-        except Exception as e: print("ERROR:" + e)
+                tickerOnlyScrapeArchieve(tlist[i])
+        except Exception as e: print("ERROR:" + str(e))
             
         print("PAGE IS: " + str(page))
 
@@ -94,14 +93,8 @@ def Count(row):
     file.close()
     return Count
 
-# NewBook('tester')
-# while True:
-
-    
-    # while True:
-    #     ThreadIDGet()
-    #     TextGet()
-    # Update()
+def LoopPages():
+    TextGetArchieve(0,15)
 
 def main(argv):
 

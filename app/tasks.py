@@ -34,10 +34,10 @@ def getNewChanData():
  
 
 celery.conf.beat_schedule = {
-    "run-me-every-ten-seconds": {
-        "task": "tasks.check",
-        "schedule": 10.0
-    },
+    # "run-me-every-ten-seconds": {
+    #     "task": "tasks.check",
+    #     "schedule": 10.0
+    # },
     "scrap-recent-chan-data": {
         "task": "tasks.getNewChanData",
         'schedule': crontab(minute=(datetime.now().minute + 1) % 10)

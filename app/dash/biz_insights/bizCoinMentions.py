@@ -14,7 +14,8 @@ from plotly.subplots import make_subplots
 
 from .data_parsing import *
 
-dropDownOptions =  [{'label': "ALL", 'value': "ALL"}]
+dropDownOptions =  [{'label': "TRENDING", 'value': "TRENDING"}]
+df = ""
 
 app_layout = html.Div(
     children=[
@@ -68,7 +69,7 @@ app_layout = html.Div(
                                 dcc.Dropdown(
                                     id='demo-dropdown',
                                     options=dropDownOptions,
-                                    value='ALL'
+                                    value="TRENDING"
                                 ),
                     
                                 html.Div(id='output-container-range-slider'),
@@ -90,115 +91,132 @@ app_layout = html.Div(
 
 
 def showSingleLineGraphMarket(app):
+    pass
+
+    
+    
+# Use the following function when accessing the value of 'my-range-slider'
+# in callbacks to transform the output value to logarithmic
+def transform_value(value):
+    switcher={
+            0:0,
+            1:10000000, #10M
+            2:50000000, #50M
+            3:100000000,  #100M
+            4:500000000,  #500M
+            5:1000000000,   #1B
+            6:10000000000,  #10B
+            7:50000000000,  #50B
+            8:100000000000, #100B
+            9:500000000000, #500B
+            10:1000000000000, #1T
+            11:2000000000000 #2T
+            }
+    return switcher.get(value,"Invalid day of week")
+
+            
+#  Market Cap and ticker selector 
+def update_line_chart(market, ticker_selector):
     df = getAllTickerData()
     # Get 10 day average sort by it 
     df["sma10"] = ta.sma(df.Mentions, length=20)
     # df = df.sort_values(by=['sma10'])
 
-    
-    
-    # Use the following function when accessing the value of 'my-range-slider'
-    # in callbacks to transform the output value to logarithmic
-    def transform_value(value):
-        switcher={
-                0:0,
-                1:10000000, #10M
-                2:50000000, #50M
-                3:100000000,  #100M
-                4:500000000,  #500M
-                5:1000000000,   #1B
-                6:10000000000,  #10B
-                7:50000000000,  #50B
-                8:100000000000, #100B
-                9:500000000000, #500B
-                10:1000000000000, #1T
-                11:2000000000000 #2T
-             }
-        return switcher.get(value,"Invalid day of week")
+    # df = df['marketCap'].nlargest(n=10)
+    trendingTickers = []
 
     # Drop of all tickers and an addition option to show all
-    
     today = datetime.today()
     for i in df[df['Time'] > (today - pd.offsets.Day(10))].sort_values(by='sma10', ascending=False).ticker.unique():
+        # Add ticker values to drop down
         dropDownOptions.append({'label': i, 'value': i})
+        # Add to trendingTickers
+        if len(trendingTickers) <= 10:
+            trendingTickers.append(i) 
 
-  
-                
-    #  Market Cap and ticker selector 
-    @app.callback(
-        Output("line-chart", "figure"),
-        [Input('my-range-slider', 'value'),Input('demo-dropdown', 'value')])
-    def update_line_chart(market, ticker_selector):
-        # converting 1-10 to market cap intervals
-        transformed_value = [transform_value(v) for v in market]
-        # Make mask where true if in range
-        marketCapMask = (df.marketCap >= transformed_value[0]) & (df.marketCap <= transformed_value[1])
+    df = df[df["ticker"].isin(trendingTickers)]
+     
+    # converting 1-10 to market cap intervals
+    transformed_value = [transform_value(v) for v in market]
+    # Make mask where true if in range
+    marketCapMask = (df.marketCap >= transformed_value[0]) & (df.marketCap <= transformed_value[1])
 
-        # ticker selector
-        if ticker_selector and ticker_selector != "ALL": 
-            tickerMask  = (df.ticker.str.fullmatch(ticker_selector)) == False
-        else:
-            tickerMask  = (df.ticker.str.contains("ALL")) == True
-       
-        # Create figure with secondary y-axis
-        fig = make_subplots(specs=[[{"secondary_y": True}]])
-        # Only show rows where mask is true
+    # ticker selector
+    if ticker_selector and ticker_selector != "TRENDING": 
+        tickerMask  = (df.ticker.str.fullmatch(ticker_selector)) == False
+    else:
+        tickerMask  = (df.ticker.str.contains("TRENDING")) == True
     
+    # Create figure with secondary y-axis
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    # Only show rows where mask is true
 
-        graphingDf = df[~(marketCapMask & tickerMask)]
-        grouped = graphingDf.groupby('ticker')
 
-        for name, group in grouped:
+    graphingDf = df[~(marketCapMask & tickerMask)]
+    grouped = graphingDf.groupby('ticker')
+
+    for name, group in grouped:
             fig.add_trace(go.Scatter(x=group.Time, y=group.Mentions,# color='ticker',
                         mode='lines',
                         name=name),
                     row=1, 
                     col=1,
-                    secondary_y=False)
-        # Show price when only one coin is selected
-        if ticker_selector and ticker_selector != "ALL": 
-            # priceDF = getChartById( graphingDf['coinGeckoId'].iloc[0])
-            priceDF = getHourlyChartById( graphingDf['coinGeckoId'].iloc[0])
-            # Only include pricing data which mention data exists for
-            priceDF = priceDF[priceDF.Time >= df.Time.min()]
-            fig.add_trace(go.Scatter(x=priceDF.Time, y=priceDF.Price,
-                        mode='lines',
-                        name='Price'), 
-                    row=1,
-                    col=1,
-                    secondary_y=True)
-            # Add SMA to graph
-            fig.add_trace(go.Scatter(x=graphingDf.Time, y=graphingDf.sma10,
-                        mode='lines',
-                        name='SMA10'), 
-                    row=1,
-                    col=1,
-                    secondary_y=False)
+                    secondary_y=False) 
+    # Show price when only one coin is selected
+    if ticker_selector and ticker_selector != "TRENDING": 
+        # priceDF = getChartById( graphingDf['coinGeckoId'].iloc[0])
+        priceDF = getHourlyChartById( graphingDf['coinGeckoId'].iloc[0])
+        # Only include pricing data which mention data exists for
+        priceDF = priceDF[priceDF.Time >= df.Time.min()]
+        fig.add_trace(go.Scatter(x=priceDF.Time, y=priceDF.Price,
+                    mode='lines',
+                    name='Price'), 
+                row=1,
+                col=1,
+                secondary_y=True)
+        # Add SMA to graph
+        fig.add_trace(go.Scatter(x=graphingDf.Time, y=graphingDf.sma10,
+                    mode='lines',
+                    name='SMA10'), 
+                row=1,
+                col=1,
+                secondary_y=False)
 
-            
+        
 
-        # Change graph height and theme
-        fig.update_layout(
-            bargap=0.01,
-            bargroupgap=0,
-            barmode="group",
-            margin=go.layout.Margin(l=10, r=0, t=0, b=50),
-            #showlegend=False,
-            plot_bgcolor="#323130",
-            paper_bgcolor="#323130",
-            # dragmode="select",
-            font=dict(color="white"),
-            # autosize=False,
-            height=600,
-            template="plotly_dark"
-        )
+    # Change graph height and theme
+    fig.update_layout(
+        bargap=0.01,
+        bargroupgap=0,
+        barmode="group",
+        margin=go.layout.Margin(l=10, r=0, t=0, b=50),
+        #showlegend=False,
+        plot_bgcolor="#323130",
+        paper_bgcolor="#323130",
+        # dragmode="select",
+        font=dict(color="white"),
+        # autosize=False,
+        height=600,
+        template="plotly_dark"
+    )
 
-        return fig
+    return fig
 
 def init_dash(server):
     dash_app = Dash(server=server, routes_pathname_prefix="/biz/", )
     dash_app.layout = app_layout
+
     showSingleLineGraphMarket(dash_app)
+    
+    dash_app.callback(
+        Output("line-chart", "figure"),
+        [
+            Input('my-range-slider', 'value'),
+            Input('demo-dropdown', 'value')
+
+        ],
+    )(update_line_chart)
+
     return dash_app.server
 
 if __name__ == '__main__':

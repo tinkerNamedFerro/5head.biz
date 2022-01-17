@@ -57,7 +57,7 @@ services:
       context: ./
       dockerfile: Dockerfile
     working_dir: /app
-    command: celery -A app.tasks worker -l info -E
+    command: celery -A app.tasks worker -l info --concurrency=4 -E
     environment:
       CELERY_BROKER_URL: redis://redis
       CELERY_RESULT_BACKEND: redis://redis

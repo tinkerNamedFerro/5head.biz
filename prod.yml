@@ -12,6 +12,8 @@ services:
     depends_on:
       - database
       - redis
+    expose:
+      - "5000"
     networks:
       - db_nw
       - web_nw

@@ -15,7 +15,17 @@ from plotly.subplots import make_subplots
 from .data_parsing import *
 
 dropDownOptions =  [{'label': "TRENDING", 'value': "TRENDING"}]
-df = ""
+
+df = getAllTickerData()
+df["sma10"] = ta.sma(df.Mentions, length=20)
+
+
+# Drop of all tickers and an addition option to show all
+today = datetime.today()
+for i in df[df['Time'] > (today - pd.offsets.Day(10))].sort_values(by='sma10', ascending=False).ticker.unique():
+    # Add ticker values to drop down
+    dropDownOptions.append({'label': i, 'value': i})
+
 
 app_layout = html.Div(
     children=[
@@ -24,7 +34,7 @@ app_layout = html.Div(
             children=[
                 # Column for user controls
                 html.Div(
-                    # className="three columns div-user-controls",
+                    className="three columns div-user-controls",
                     children=[
                         html.A(
                             html.Img(
@@ -45,7 +55,7 @@ app_layout = html.Div(
                                 ),
                                 # Slider for specifying stroke width
                                 dcc.RangeSlider(
-                                    id='my-range-slider',
+                                    id='market-cap-slider',
                                     min=0,
                                     max=11,
                                     step=None,
@@ -67,7 +77,7 @@ app_layout = html.Div(
                                     value=[0, 11]
                                 ),
                                 dcc.Dropdown(
-                                    id='demo-dropdown',
+                                    id='ticker-dropdown',
                                     options=dropDownOptions,
                                     value="TRENDING"
                                 ),
@@ -89,9 +99,6 @@ app_layout = html.Div(
     ]
 )
 
-
-def showSingleLineGraphMarket(app):
-    pass
 
     
     
@@ -133,7 +140,6 @@ def update_line_chart(market, ticker_selector):
         # Add to trendingTickers
         if len(trendingTickers) <= 10:
             trendingTickers.append(i) 
-
     df = df[df["ticker"].isin(trendingTickers)]
      
     # converting 1-10 to market cap intervals
@@ -181,9 +187,6 @@ def update_line_chart(market, ticker_selector):
                 row=1,
                 col=1,
                 secondary_y=False)
-
-        
-
     # Change graph height and theme
     fig.update_layout(
         bargap=0.01,
@@ -196,30 +199,31 @@ def update_line_chart(market, ticker_selector):
         # dragmode="select",
         font=dict(color="white"),
         # autosize=False,
-        height=600,
-        template="plotly_dark"
+        height=1000,
+        yaxis=dict(
+            range=[2, graphingDf['Mentions'].max()+100]
+            )
+        # template="plotly_dark"
     )
-
     return fig
 
 def init_dash(server):
     dash_app = Dash(server=server, routes_pathname_prefix="/biz/", )
-    dash_app.layout = app_layout
-
-    showSingleLineGraphMarket(dash_app)
+    
     
     dash_app.callback(
         Output("line-chart", "figure"),
         [
-            Input('my-range-slider', 'value'),
-            Input('demo-dropdown', 'value')
+            Input('market-cap-slider', 'value'),
+            Input('ticker-dropdown', 'value')
 
         ],
     )(update_line_chart)
 
+    dash_app.layout = app_layout
+    
     return dash_app.server
 
 if __name__ == '__main__':
-    showSingleLineGraphMarket()
     app.run_server(debug=True)
 

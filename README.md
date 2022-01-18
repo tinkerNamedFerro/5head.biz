@@ -45,6 +45,8 @@ docker-compose up -d
 Local Server
 ```
 uwsgi --ini ./local.ini
+// Less than ideal hot reload
+uwsgi --touch-reload="app/dash/biz_insights/bizCoinMentions.py" --ini ./local.ini
 ```
 
 ### Integrate your Dash app

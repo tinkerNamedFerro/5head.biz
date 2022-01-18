@@ -1,6 +1,6 @@
 /* Custom App CSS Below --------------------------------- */
 /*Fonts ––––––––––––––––––––––––––––––––––––––––––––––––––*/
-@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+/* @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap'); */
 
 /* Main Layout ––––––––––––––––––––––––––––––––––––––––––––––––––*/
 body {
@@ -50,7 +50,7 @@ a {
 /* Graph Control Objects ––––––––––––––––––––––––––––––––––––––––––––––––––*/
 .div-user-controls {
   padding-left: 55px;
-  padding-top: 64px;
+  padding-top: 100px;
 }
 .div-for-dropdown {
   padding-top: 12px;

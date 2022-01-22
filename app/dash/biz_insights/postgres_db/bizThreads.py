@@ -50,3 +50,7 @@ def getTickerDataPd(ticker):
     query = """SELECT mentionId, ticker, coinGeckoId, threadId, unixTime, datetime FROM biztickermentions WHERE ticker='%s';"""%(ticker)
     pd = db.queryToPD(query)
     return pd
+
+def deleteTickerFunc(ticker):
+    return db.deleteTicker(ticker)
+    

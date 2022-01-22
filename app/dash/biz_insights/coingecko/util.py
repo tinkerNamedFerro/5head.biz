@@ -41,13 +41,13 @@ def getChartById(id):
     return df
 
 # https://www.coingecko.com/api/documentations/v3#/coins/get_coins__id__market_chart_range
-def getHourlyChartById(id):
+def getHourlyChartById(id, daysOfMentionData):
     cg = CoinGeckoAPI()
     # current time
     dateTimeObj = datetime.now()
     today = time.mktime(dateTimeObj.timetuple())
     # 89 days ago to get hourly data
-    eightyNine_days_ago = dateTimeObj - timedelta(days=89)
+    eightyNine_days_ago = dateTimeObj - timedelta(days=daysOfMentionData)
     past = time.mktime(eightyNine_days_ago.timetuple())
     response = cg.get_coin_market_chart_range_by_id(id=id, vs_currency='usd', from_timestamp=past, to_timestamp=today)
     df = pd.DataFrame(response["prices"], 

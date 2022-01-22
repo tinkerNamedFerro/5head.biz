@@ -49,33 +49,33 @@ app_layout = html.Div(
                         ),
                         html.Div(
                             children=[
-                                    dbc.Label(
-                                    "Market Cap",
-                                    html_for="stroke-width",
-                                ),
-                                # Slider for specifying stroke width
-                                dcc.RangeSlider(
-                                    id='market-cap-slider',
-                                    min=0,
-                                    max=11,
-                                    step=None,
-                                    allowCross=False,
-                                    marks={
-                                        0: '0',
-                                        1: '10M',
-                                        2: '50M',
-                                        3: '100M',
-                                        4: '500M',
-                                        5: '1B',
-                                        6: '10B',
-                                        7: '50B',
-                                        8: '100B',
-                                        9: '500B',
-                                        10: '1T',
-                                        11: '2T',
-                                    },
-                                    value=[0, 11]
-                                ),
+                                #     dbc.Label(
+                                #     "Market Cap",
+                                #     html_for="stroke-width",
+                                # ),
+                                # # Slider for specifying stroke width
+                                # dcc.RangeSlider(
+                                #     id='market-cap-slider',
+                                #     min=0,
+                                #     max=11,
+                                #     step=None,
+                                #     allowCross=False,
+                                #     marks={
+                                #         0: '0',
+                                #         1: '10M',
+                                #         2: '50M',
+                                #         3: '100M',
+                                #         4: '500M',
+                                #         5: '1B',
+                                #         6: '10B',
+                                #         7: '50B',
+                                #         8: '100B',
+                                #         9: '500B',
+                                #         10: '1T',
+                                #         11: '2T',
+                                #     },
+                                #     value=[0, 11]
+                                # ),
                                 dcc.Dropdown(
                                     id='ticker-dropdown',
                                     options=dropDownOptions,
@@ -123,7 +123,7 @@ def transform_value(value):
 
             
 #  Market Cap and ticker selector 
-def update_line_chart(market, ticker_selector):
+def update_line_chart(ticker_selector): #def update_line_chart(market, ticker_selector):
     df = getAllTickerData()
     # Get 10 day average sort by it 
     df["sma10"] = ta.sma(df.Mentions, length=20)
@@ -131,7 +131,6 @@ def update_line_chart(market, ticker_selector):
 
     # df = df['marketCap'].nlargest(n=10)
     trendingTickers = []
-
     # Drop of all tickers and an addition option to show all
     today = datetime.today()
     for i in df[df['Time'] > (today - pd.offsets.Day(10))].sort_values(by='sma10', ascending=False).ticker.unique():
@@ -143,7 +142,9 @@ def update_line_chart(market, ticker_selector):
     df = df[df["ticker"].isin(trendingTickers)]
      
     # converting 1-10 to market cap intervals
+    market = [0, 11]
     transformed_value = [transform_value(v) for v in market]
+    print(transformed_value)
     # Make mask where true if in range
     marketCapMask = (df.marketCap >= transformed_value[0]) & (df.marketCap <= transformed_value[1])
 
@@ -161,6 +162,7 @@ def update_line_chart(market, ticker_selector):
     graphingDf = df[~(marketCapMask & tickerMask)]
     grouped = graphingDf.groupby('ticker')
 
+
     for name, group in grouped:
             fig.add_trace(go.Scatter(x=group.Time, y=group.Mentions,# color='ticker',
                         mode='lines',
@@ -171,7 +173,8 @@ def update_line_chart(market, ticker_selector):
     # Show price when only one coin is selected
     if ticker_selector and ticker_selector != "TRENDING": 
         # priceDF = getChartById( graphingDf['coinGeckoId'].iloc[0])
-        priceDF = getHourlyChartById( graphingDf['coinGeckoId'].iloc[0])
+        daysOfMentionData = (datetime.today() - graphingDf['Time'].min()).days
+        priceDF = getHourlyChartById( graphingDf['coinGeckoId'].iloc[0], daysOfMentionData)
         # Only include pricing data which mention data exists for
         priceDF = priceDF[priceDF.Time >= df.Time.min()]
         fig.add_trace(go.Scatter(x=priceDF.Time, y=priceDF.Price,
@@ -199,9 +202,10 @@ def update_line_chart(market, ticker_selector):
         # dragmode="select",
         font=dict(color="white"),
         # autosize=False,
-        height=1000,
+        height=800,
+        legend = dict(x = 0.1, y = 0.8),
         yaxis=dict(
-            range=[2, graphingDf['Mentions'].max()+100]
+            range=[2, graphingDf['Mentions'].max()+100],
             )
         # template="plotly_dark"
     )
@@ -214,7 +218,7 @@ def init_dash(server):
     dash_app.callback(
         Output("line-chart", "figure"),
         [
-            Input('market-cap-slider', 'value'),
+            # Input('market-cap-slider', 'value'),
             Input('ticker-dropdown', 'value')
 
         ],

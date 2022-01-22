@@ -74,3 +74,18 @@ class Database:
         self.connect()
         dat = sqlio.read_sql_query(query, self.conn)
         return dat
+
+    def deleteTicker(self,ticker):
+        """ delete part by part id """
+        # create a new cursor
+        cur = self.conn.cursor()
+        # execute the UPDATE  statement
+        cur.execute("DELETE FROM biztickermentions WHERE ticker = '%s'"%(ticker))
+        # get the number of updated rows
+        rows_deleted = cur.rowcount
+        # Commit the changes to the database
+        self.conn.commit()
+        return rows_deleted
+        # Close communication with the PostgreSQL database
+
+  

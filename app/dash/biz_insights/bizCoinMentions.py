@@ -139,8 +139,7 @@ def update_line_chart(ticker_selector): #def update_line_chart(market, ticker_se
         # Add to trendingTickers
         if len(trendingTickers) <= 10:
             trendingTickers.append(i) 
-    df = df[df["ticker"].isin(trendingTickers)]
-     
+
     # converting 1-10 to market cap intervals
     market = [0, 11]
     transformed_value = [transform_value(v) for v in market]
@@ -152,6 +151,9 @@ def update_line_chart(ticker_selector): #def update_line_chart(market, ticker_se
     if ticker_selector and ticker_selector != "TRENDING": 
         tickerMask  = (df.ticker.str.fullmatch(ticker_selector)) == False
     else:
+        # Apply trending tickers to dataframe
+        df = df[df["ticker"].isin(trendingTickers)]
+
         tickerMask  = (df.ticker.str.contains("TRENDING")) == True
     
     # Create figure with secondary y-axis

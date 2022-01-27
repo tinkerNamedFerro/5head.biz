@@ -7,8 +7,12 @@ from datetime import datetime
 from .dash.biz_insights import data_parsing
 from .dash.biz_insights import getThreads
 
+
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379'),
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379')
+
+PSQL_HOST = os.environ.get('PSQL_HOST', '127.0.0.1')
+
 
 celery = Celery('tasks', broker=CELERY_BROKER_URL, backend=CELERY_RESULT_BACKEND)
 
@@ -29,7 +33,9 @@ def regenGraphData():
 
 @celery.task(name='tasks.getNewChanData')
 def getNewChanData():
-    getThreads.LoopPages()
+    # If db is being called through a ssh tunnel port (locally) don't run
+    if PSQL_HOST != "127.0.0.1":
+        getThreads.LoopPages()
 
  
 

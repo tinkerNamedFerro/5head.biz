@@ -39,6 +39,7 @@ def generateCurrenciesList():
     # save all coins in json
     with open('data.json', 'w', encoding='utf-8') as f:
         json.dump(coins, f, ensure_ascii=False, indent=4)
-    
+        
+    return coins
 
 generateCurrenciesList()

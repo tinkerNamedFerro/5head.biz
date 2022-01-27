@@ -8,11 +8,11 @@ from ..postgres_db.bizThreads import *
 
 # Load json file for coin list 
 # generateCurrenciesList()
-with open('data.json') as json_file:
-    CD = json.load(json_file)
+# with open('data.json') as json_file:
+#     CD = json.load(json_file)
 
 # Checks message and returns a list of all found tickers
-def checkTickerList(message):
+def checkTickerList(message, CD):
     # len(CD)
     found = []
     for row in CD:
@@ -36,6 +36,7 @@ def tickerOnlyScrapeArchieve(threadId):
     comments = soup.find_all("article", {"class": "post"})
     
     opProcessed = False
+    CD = generateCurrenciesList()
     for index in range(0,len(replies)):
         instance = {}
         if not opProcessed:
@@ -43,7 +44,7 @@ def tickerOnlyScrapeArchieve(threadId):
             opProcessed = True 
 
             message = replies[index].get_text().replace(">", " ")
-            tickerList = checkTickerList(message)
+            tickerList = checkTickerList(message, CD)
             #  if string is empty this will no execute 
             # print(message)
             for ticker in tickerList:
@@ -69,7 +70,7 @@ def tickerOnlyScrapeArchieve(threadId):
         else:
             text = replies[index].get_text().replace(">", " ")
             # print(text)
-            tickerList = checkTickerList(text)
+            tickerList = checkTickerList(text, CD)
             #  if string is empty this will no execute 
             for ticker in tickerList:
                 #print(ticker)

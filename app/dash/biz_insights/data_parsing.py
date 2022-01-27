@@ -9,10 +9,6 @@ from .postgres_db.bizThreads import *
 from .coingecko.util import *
 from .CoinDict import *
 
-
-with open('data.json') as json_file:
-    CD = json.load(json_file)
-
 def updateAllTickerData():
     listOfTickers = getTickers()
 

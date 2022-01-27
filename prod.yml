@@ -49,6 +49,7 @@ services:
       - database-data:/var/lib/postgresql/data/ # persist data even if container shuts down
     ports:
       - "5432:5432"
+    restart: always
     networks:
       - db_nw
 

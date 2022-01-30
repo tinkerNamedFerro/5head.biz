@@ -12,6 +12,7 @@ services:
       - "./:/app"
     depends_on:
       - redis
+    network_mode: host
     ports:
       - "5000:5000"
 

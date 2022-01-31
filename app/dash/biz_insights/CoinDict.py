@@ -20,8 +20,10 @@ def getBlickList():
 def generateCurrenciesList():
     # calling kucoin api to get all coins
     # currenciesResponse = getCurrencies()
-    blackList = getBlickList()
-
+    blackListTMP = getBlickList()
+    blackList = []
+    for x in blackListTMP:
+       blackList.append(x[0])
     geckoCoinList = coinGeckoList()
     coins = []
     # Looping through coins to get ticker and name
@@ -32,7 +34,6 @@ def generateCurrenciesList():
         # If ticker is in blackList mark as so
         if ticker in commonTickerList:
             commonTicker = True
-
         if ticker not in blackList:
             coin = {"aka":[ticker], 'name':name, "commonTicker" : commonTicker, "coinGeckoId":row["id"]}
             coins.append(coin)
